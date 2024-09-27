@@ -8,10 +8,10 @@ import socket
 serverName = 'localhost'
 serverPort = 12000
 
-# Create a UDP socket
-clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# Set a timeout of 1 second
-clientSocket.settimeout(1)
+# Create a TCP socket
+clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Connect to the server
+clientSocket.connect((serverName, serverPort))
 
 # Send 10 ping requests
 for sequence_number in range(1, 11):
@@ -21,17 +21,17 @@ for sequence_number in range(1, 11):
     
     try:
         # Send the ping message
-        clientSocket.sendto(message.encode(), (serverName, serverPort))
+        clientSocket.send(message.encode())
         
         # Wait for the response from the server
-        response, serverAddress = clientSocket.recvfrom(1024)
+        response = clientSocket.recv(1024).decode()
         recv_time = time.time()
         
         # Calculate RTT
         rtt = recv_time - send_time
         
         # Print the server response and RTT
-        print(f"Received from server: {response.decode()}")
+        print(f"Received from server: {response}")
         print(f"RTT: {rtt:.4f} seconds")
         
     except socket.timeout:
